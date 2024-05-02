@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SearchIcon from '@mui/icons-material/Search';
 import "../header/header.css";
 import Logo from "../../assets/images/logo.svg";
 import Select from "../selectDrop/select";
+import axios from 'axios';
 
 
 const Header = () => {
 
   const [categories,setCategories] = useState([
-    'All categories',
     'Milks and Dairies',
     'Wines & Drinks',
     'Clothing & Beauty',
@@ -23,7 +23,27 @@ const Header = () => {
     'Wines & Drinks',
     'Clothing & Beauty',
     'Fresh Seafood',
-  ])
+  ]);
+
+  const countryList = [];
+
+  useEffect(()=>{
+    getCountry('https://countriesnow.space/api/v0.1/countries/');
+  },[]);
+
+  const getCountry = async(url)=>{
+    try{
+      await axios.get(url).then((res)=>{
+        if(res!==null){
+          res.data.data.map((item,index)=>{
+            countryList.push(item.country);
+          })
+        }
+      })
+    }catch(error){
+      console.log(error.message);
+    }
+  }
 
   return (
     <header>
@@ -32,21 +52,28 @@ const Header = () => {
           <div className="col-sm-2">
             <img src={Logo} alt="err" />
           </div>
-          {/* header search */}
+
+
+          {/* Category Search Inside Search Bar */}
           <div className="col-sm-5">
             <div className="headerSearch d-flex align-items-center">
-            <Select data={categories}/>
-              
+            <Select data={categories} placeholder={'All categories'}/>
               <div className="search">
                 <input type="text" placeholder="Search for items.."/>
                 <SearchIcon className="searchIcon cursor"/>
               </div>
             </div>
           </div>
-          {/* Header Search Start Here */}
-          <div className="col-sm-5">
-            <Select/>
+
+
+          {/* Country search next to Search Bar */}
+          <div className="col-sm-5 d-flex align-items-center">
+            <div className="countryWrapper">
+            <Select data={countryList} placeholder={'Your : Location'}/>
+            </div>
           </div>
+
+
         </div>
       </div>
     </header>
